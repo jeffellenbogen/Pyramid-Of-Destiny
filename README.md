@@ -5,5 +5,5 @@ This repository is an attempt to bring together multiple code experiments to lig
 ### Plain Pyramid: Phase One
 <img src="./images/pyramid.jpeg" width="200">
 
-### LED Lit Pyramids: Phase Two
+### LED lit Pyramid: Phase Two
 <img src="./images/pyramid-leds.png" width="200">
