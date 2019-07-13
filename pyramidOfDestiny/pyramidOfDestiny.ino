@@ -14,7 +14,7 @@
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, true);
 
 int potValue, envelopeValue, audioModifier, baseColor;
-int pattern = 1
+int pattern = 1;
 int colorGradient = 40;
 int audioGradientMax = 500;
 
@@ -27,7 +27,7 @@ void setup() {
 
 void loop() {
   // check for button press and increment pattern number
-  if (digitalRead(BUTTON_PIN) = LOW)
+  if (digitalRead(BUTTON_PIN) == LOW)
     {
       pattern++;
       delay(1000);
@@ -53,7 +53,7 @@ void loop() {
     circularDivision();
   else if (pattern == 3)
     redBlueFade();
-  else
+  
     // add additional patterns here later
 }
 
@@ -66,4 +66,14 @@ void drawColorRects()
       rectColor = rectColor + colorGradient;
       }
       matrix.swapBuffers(true);
+}
+
+void circularDivision()
+{
+  
+}
+
+void redBlueFade()
+{
+  
 }
