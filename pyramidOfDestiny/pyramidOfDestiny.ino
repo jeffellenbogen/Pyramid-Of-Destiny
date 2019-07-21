@@ -18,7 +18,6 @@ int pattern = 1;
 int colorGradient = 40;
 int audioGradientMax = 500;
 
- 
 void setup() {
   matrix.begin();
   Serial.begin(9600);
