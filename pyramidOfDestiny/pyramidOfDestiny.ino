@@ -12,7 +12,12 @@
 #define POT_PIN A5
 #define BUTTON_PIN 8
 
+#define MIN_ENVELOPE 6
 #define MAX_ENVELOPE 150
+
+#define MATRIX_WIDTH 32
+#define MATRIX_HEIGHT 32
+
 RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, true);
 
 int potValue, envelopeValue;
@@ -28,7 +33,7 @@ void setup() {
 void loop() {  
   //Read envelopeValue and adjust audioModifier value based on that reading
   envelopeValue = analogRead(ENVELOPE_PIN);
-  envelopeValue = constrain(envelopeValue,0,MAX_ENVELOPE);
+  envelopeValue = constrain(envelopeValue, MIN_ENVELOPE, MAX_ENVELOPE);
 
   // Read potValue to set the baseColor for the pattern
   potValue = analogRead(POT_PIN);
@@ -42,9 +47,9 @@ void loop() {
   else if (pattern == 2)
     circularDivision(potValue, envelopeValue);
   else if (pattern == 3)
-    redBlueFade();
+    redBlueFade(potValue, envelopeValue);
   else if (pattern == 4)
-    sparkles();
+    sparkles(potValue, envelopeValue);
   
    // add additional patterns beyond #4 here later
 }
@@ -66,7 +71,7 @@ void drawColorRects(int passedPotValue, int passedEnvelopeValue)
   int colorGradient = 40;
   int audioGradientMax = 500;
   
-  int audioModifier = map(passedEnvelopeValue,6,MAX_ENVELOPE,0,audioGradientMax);
+  int audioModifier = map(passedEnvelopeValue,MIN_ENVELOPE,MAX_ENVELOPE,0,audioGradientMax);
   int rectColor = map(passedPotValue,0,1023,0,1536);
   
   for (int c = 0; c < 16; c++)
@@ -80,7 +85,7 @@ void drawColorRects(int passedPotValue, int passedEnvelopeValue)
 void circularDivision(int passedPotValue, int passedEnvelopeValue)
 {
   int powerOf2[]={0,1,2,4,8,16};
-  int divisions = map(passedEnvelopeValue, 6, MAX_ENVELOPE, 0, 2);
+  int divisions = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 2);
   
   int radius = round(powerOf2[5-divisions])/2;
   int rows_cols = round(powerOf2[5-divisions])*2;
@@ -132,7 +137,7 @@ void circularDivision(int passedPotValue, int passedEnvelopeValue)
     };
   
   if (divisions >= 1)
-    colorRandomizer = random(0,4);
+    colorRandomizer = random(1,4);
     
 
   for (int a = 0; a < rows_cols; a++)
@@ -142,11 +147,11 @@ void circularDivision(int passedPotValue, int passedEnvelopeValue)
             static int x, y;
             x = (b * radius*2)-radius;
             y = (a * radius*2)-radius;
-            if (colorRandomizer%6==0)
+            if (colorRandomizer%6==1)
               matrix.fillCircle(x,y,radius,color_palette1[(a+b)%2+colorRandomizer]);
-            else if (colorRandomizer%6==1)
-              matrix.fillCircle(x,y,radius,color_palette2[(a+b)%2+colorRandomizer]);
             else if (colorRandomizer%6==2)
+              matrix.fillCircle(x,y,radius,color_palette2[(a+b)%2+colorRandomizer]);
+            else if (colorRandomizer%6==3)
               matrix.fillCircle(x,y,radius,color_palette3[(a+b)%2+colorRandomizer]);     
             else
               matrix.fillCircle(x,y,radius,color_palette4[(a+b)%2+colorRandomizer]);      
@@ -155,12 +160,45 @@ void circularDivision(int passedPotValue, int passedEnvelopeValue)
   matrix.swapBuffers(true);
 }
 
-void redBlueFade()
+void redBlueFade(int passedPotValue, int passedEnvelopeValue)
 {
+  int rectX, rectY, rectWidth, rectHeight, rectRed, rectBlue, rectGreen;
+  rectBlue = map(passedEnvelopeValue, MIN_ENVELOPE,MAX_ENVELOPE, 0, 15) / 2 + 1;
+  rectRed = map(passedPotValue, 0, 1023, 0, 15);
+
+  if (passedEnvelopeValue <= 80)
+    rectGreen = 0;
+  else
+    rectGreen = passedEnvelopeValue % 8;
+  
+  for (int i = 0; i <= 16; i++)
+  {
+    rectX = i;
+    rectY = i;
+    rectWidth = 32-2*i;
+    rectHeight = 32-2*i;
+    if (rectRed > 5)
+        rectRed--;
+ 
+    matrix.drawRect(rectX, rectY, rectWidth, rectHeight, matrix.Color444(rectRed,rectGreen,rectBlue)); 
+  }  
   
 }
 
-void sparkles()
+void sparkles(int passedPotValue, int passedEnvelopeValue)
 {
+  int sparkleSize = map(passedPotValue, 0, 1023, 0, 5);
+  int numSparkles = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 10);
   
+  for (int i=0; i <= numSparkles; i++)
+    {
+    int randX = random(0,MATRIX_WIDTH);
+    int randY = random(0,MATRIX_HEIGHT);
+    int randomColor = random(0,255);
+    for (int j=0; j <= sparkleSize; j++)
+      {
+        matrix.fillCircle(randX, randY, j, matrix.ColorHSV(randomColor, 255, 255, true));
+        delay(5);
+      }
+    }
 }
