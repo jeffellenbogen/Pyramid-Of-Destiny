@@ -230,10 +230,14 @@ void drawCircles(int passedDivisions)
 
 void sparkles(int passedPotValue, int passedEnvelopeValue)
 {
-  int sparkleSize = map(passedPotValue, 0, 1023, 0, 5);
-  int numSparkles = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 10);
+  int sparkleSize = map(passedPotValue, 0, 1023, 0, 8);
+  int numSparkles = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 7);
+  Serial.print("sparkleSize = ");
+  Serial.print(sparkleSize);
+  Serial.print(" | numSparkles = ");
+  Serial.println(numSparkles);
   
-  for (int i=0; i <= numSparkles; i++)
+  for (int i=0; i < numSparkles; i++)
     {
     buttonPressed();  
     int randX = random(0,MATRIX_WIDTH);
@@ -241,10 +245,11 @@ void sparkles(int passedPotValue, int passedEnvelopeValue)
     int randomColor = random(0,1500);
     for (int j=0; j <= sparkleSize; j++)
       {
-        matrix.fillCircle(randX, randY, j, matrix.ColorHSV(randomColor, 255, 255, true));
-        delay(5);
+        matrix.fillCircle(randX, randY, j-i, matrix.ColorHSV(randomColor, 255, 255, true));
+        delay(25);
         matrix.swapBuffers(true);
       }
     }
+    matrix.fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, matrix.ColorHSV(0, 0, 0, true));
     matrix.swapBuffers(true);
 }
