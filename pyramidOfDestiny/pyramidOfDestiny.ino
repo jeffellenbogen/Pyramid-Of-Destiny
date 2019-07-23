@@ -8,6 +8,8 @@
 #define C   A2
 #define D   A3
 
+//This is a comment
+
 #define ENVELOPE_PIN A4
 #define POT_PIN A5
 #define BUTTON_PIN 8
