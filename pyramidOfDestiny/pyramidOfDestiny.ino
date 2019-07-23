@@ -8,7 +8,7 @@
 #define C   A2
 #define D   A3
 
-#define ENVELOPE_PIN A4
+#define ENVELOPE_PIN A3
 #define POT_PIN A5
 #define BUTTON_PIN 8
 
