@@ -8,7 +8,7 @@
 #define C   A2
 #define D   A3
 
-//This is a comment
+//This is a comment  
 
 #define ENVELOPE_PIN A4
 #define POT_PIN A5
