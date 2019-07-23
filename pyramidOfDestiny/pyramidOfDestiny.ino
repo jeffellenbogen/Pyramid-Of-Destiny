@@ -1,4 +1,3 @@
-//jim
 #include <RGBmatrixPanel.h>
 
 #define CLK  11   // USE THIS ON ARDUINO UNO, ADAFRUIT METRO M0, etc.
@@ -151,7 +150,7 @@ void drawColorRects(int passedPotValue, int passedEnvelopeValue)
   
   for (int c = 0; c < 16; c++)
     {
-      matrix.drawRect(c, c, 32-2*c, 32-2*c, matrix.ColorHSV(rectColor + audioModifier, 255, 255, true));
+      matrix.drawRect(c, c, MATRIX_WIDTH-2*c, MATRIX_HEIGHT-2*c, matrix.ColorHSV(rectColor + audioModifier, 255, 255, true));
       rectColor = rectColor + colorGradient;
       buttonPressed();
     }
