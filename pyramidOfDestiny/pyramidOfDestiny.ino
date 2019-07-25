@@ -15,7 +15,7 @@
 #define BUTTON_PIN 8
 
 #define MIN_ENVELOPE 6
-#define MAX_ENVELOPE 150
+#define MAX_ENVELOPE 100
 
 #define MATRIX_WIDTH 32
 #define MATRIX_HEIGHT 32
@@ -93,6 +93,29 @@ uint16_t color_palette6[] = // Univ. of Oregon Pallette
 
 
 
+uint16_t color_palette_HSV1[] = // HSV
+{
+  matrix.ColorHSV(450, 255, 20, true), 
+  matrix.ColorHSV(490, 255, 255, true), 
+  matrix.ColorHSV(1410, 255, 255, true), 
+  matrix.ColorHSV(420, 255, 255, true), 
+  matrix.ColorHSV(540, 255, 255, true), 
+  matrix.ColorHSV(500, 255, 100, true),         
+  
+};
+
+uint16_t color_palette_HSV2[] = // HSV
+{
+  matrix.ColorHSV(1250, 255, 255, true), 
+  matrix.ColorHSV(270, 255, 255, true), 
+  matrix.ColorHSV(1210, 255, 40, true), 
+  matrix.ColorHSV(1100, 255, 255, true), 
+  matrix.ColorHSV(1300, 255, 255, true), 
+  matrix.ColorHSV(1200, 255, 20, true),         
+  
+};
+
+
 
 void setup() {
   matrix.begin();
@@ -123,8 +146,9 @@ void loop() {
     redBlueFade(potValue, envelopeValue);
   else if (pattern == 4)
     sparkles(potValue, envelopeValue);
-  
-   // add additional patterns beyond #4 here later
+  else if (pattern == 5)
+    swipes(potValue, envelopeValue); 
+   // add additional patterns beyond #5 here later
 }
 
 void buttonPressed()
@@ -132,7 +156,7 @@ void buttonPressed()
     if (digitalRead(BUTTON_PIN) == LOW)
     {
       pattern++;
-      if (pattern > 4)
+      if (pattern > 5)
         pattern = 1;  
       delay(250);
       Serial.print ("Pattern #");
@@ -161,23 +185,49 @@ void circularDivision(int passedPotValue, int passedEnvelopeValue)
 {
   //envelopeValue = analogRead(ENVELOPE_PIN);
   //potValue = analogRead(POT_PIN);
-  int maxEnv = map(passedPotValue,0,1024,20, 150);
+  int maxEnv = map(passedPotValue,0,1024,20, 90);
   int constrainedEnvelope = constrain(passedEnvelopeValue,7,maxEnv);
   int divisions = map(constrainedEnvelope,6,maxEnv,0,2);
-  drawCircles(divisions);
+
+  Serial.print("  maxEnv = ");
+  Serial.print(maxEnv);
+  Serial.print("  constrainedEnvelope = ");
+  Serial.print(constrainedEnvelope);  
+  Serial.print(" divisions = ");
+  Serial.println(divisions);
+
+  if (constrainedEnvelope > 9)
+     drawCircles(divisions);
+  else
+    {
+     matrix.fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, matrix.ColorHSV(0, 0, 0, true));
+     matrix.swapBuffers(true);
+    }
 }
 
 
 void redBlueFade(int passedPotValue, int passedEnvelopeValue)
 {
   int rectX, rectY, rectWidth, rectHeight, rectRed, rectBlue, rectGreen;
-  rectBlue = map(passedEnvelopeValue, MIN_ENVELOPE,MAX_ENVELOPE, 0, 15) / 2 + 1;
-  rectRed = map(passedPotValue, 0, 1023, 3, 15);
-
-  if (passedEnvelopeValue <= 70)
+  int colorMod = map(passedPotValue, 0, 1023, 2, 10);
+  int maxEnvMod = (MAX_ENVELOPE * colorMod*10) / 100;
+  rectBlue = map(passedEnvelopeValue, MIN_ENVELOPE,maxEnvMod, 0, 15) / 2 + 1;
+  rectRed = map(passedEnvelopeValue, MIN_ENVELOPE,maxEnvMod, 3, 15);
+  
+  if (passedEnvelopeValue <= 80)
     rectGreen = 0;
   else
-    rectGreen = 15 - rectRed;
+    rectGreen = passedEnvelopeValue % 8;
+  Serial.print("colorMod = ");
+  Serial.print(colorMod);
+  Serial.print("  maxEnvMod = ");
+  Serial.print(maxEnvMod);
+  Serial.print("  rectRed = ");
+  Serial.print(rectRed);
+  Serial.print(" rectGreen = ");
+  Serial.print(rectGreen);
+  Serial.print("  rectBlue = ");
+  Serial.println(rectBlue);  
   
   for (int i = 0; i <= 16; i++)
   {
@@ -202,7 +252,7 @@ void drawCircles(int passedDivisions)
   static int colorRandomizer;
   
   if (passedDivisions >= 1)
-    colorRandomizer = random(0,6);
+    colorRandomizer = random(1,7);
 
   for (int a = 0; a < rows_cols; a++)
   {
@@ -211,18 +261,12 @@ void drawCircles(int passedDivisions)
       static int x, y;
       x = (b * radius*2)-radius;
       y = (a * radius*2)-radius;
-      if (colorRandomizer%6==0)
-        matrix.fillCircle(x,y,radius,color_palette1[(a+b)%2+colorRandomizer]);
-      else if (colorRandomizer%6==1)
-        matrix.fillCircle(x,y,radius,color_palette2[(a+b)%2+colorRandomizer]);
-      else if (colorRandomizer%6==2)
-        matrix.fillCircle(x,y,radius,color_palette3[(a+b)%2+colorRandomizer]);     
-      else if (colorRandomizer%6==3)
-        matrix.fillCircle(x,y,radius,color_palette4[(a+b)%2+colorRandomizer]);      
-       else if (colorRandomizer%6==4)
-        matrix.fillCircle(x,y,radius,color_palette5[(a+b)%2+colorRandomizer]);
+      
+      if (colorRandomizer%2==0)
+        matrix.fillCircle(x,y,radius,color_palette_HSV1[(a+b)%2+colorRandomizer]);
       else
-        matrix.fillCircle(x,y,radius,color_palette6[(a+b)%2+colorRandomizer]);
+        matrix.fillCircle(x,y,radius,color_palette_HSV2[(a+b)%2+colorRandomizer]);
+
     }
     buttonPressed();
   }
@@ -232,26 +276,93 @@ void drawCircles(int passedDivisions)
 
 void sparkles(int passedPotValue, int passedEnvelopeValue)
 {
-  int sparkleSize = map(passedPotValue, 0, 1023, 1, 8);
-  int numSparkles = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 7);
+  int sparkleSize = map(passedPotValue, 0, 1023, 2, 7);
+  int numSparkles = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 0, 8);
   Serial.print("sparkleSize = ");
   Serial.print(sparkleSize);
   Serial.print(" | numSparkles = ");
   Serial.println(numSparkles);
-  
-  for (int i=0; i < numSparkles; i++)
-    {
-    buttonPressed();  
-    int randX = random(0,MATRIX_WIDTH);
-    int randY = random(0,MATRIX_HEIGHT);
-    int randomColor = random(0,1500);
-    for (int j=1; j <= sparkleSize; j++)
+
+  if (passedEnvelopeValue > 40)
+  {
+    for (int i=0; i < numSparkles; i++)
       {
-        matrix.fillCircle(randX, randY, j-i, matrix.ColorHSV(randomColor, 255, 255, true));
-        delay(25);
-        matrix.swapBuffers(true);
+      buttonPressed();  
+      int randX = random(0,MATRIX_WIDTH);
+      int randY = random(0,MATRIX_HEIGHT);
+      int randomColor = random(1500);
+      for (int j=1; j < sparkleSize; j++)
+        {
+          matrix.fillCircle(randX, randY, j-i, matrix.ColorHSV(randomColor, 170, 255, true));
+          delay(2);
+          matrix.swapBuffers(true);
+        }
       }
-    }
-    matrix.fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, matrix.ColorHSV(0, 0, 0, true));
-    matrix.swapBuffers(true);
+  }
+  else
+  {
+      matrix.fillRect(0, 0, MATRIX_WIDTH, MATRIX_HEIGHT, matrix.ColorHSV(0, 0, 0, true));
+      matrix.swapBuffers(true);
+  }
+}
+
+void swipes(int passedPotValue, int passedEnvelopeValue)
+{
+  int swipeColor = map(passedPotValue, 0, 1023, 0, 1500);
+  int swipeSpeed = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 5,0);
+  int randDirection = random (1,5);
+  Serial.print("randDirection = ");
+  Serial.print(randDirection);
+  Serial.print("  swipeColor = ");
+  Serial.print(swipeColor);
+  Serial.print("   passedEnvelopeValue = ");
+  Serial.print(passedEnvelopeValue);
+  Serial.print("   swipeSpeed = ");
+  Serial.println(swipeSpeed);
+  
+  if (passedEnvelopeValue > 20)
+  {
+      if (randDirection == 1)
+      {
+        for (int i = 0; i <= MATRIX_WIDTH; i++)
+        {
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          delay(swipeSpeed);
+          matrix.swapBuffers(true);
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
+        }
+      }
+      else if (randDirection == 2)
+      {
+        for (int i = MATRIX_WIDTH; i >=0; i--)
+        {
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          delay(swipeSpeed);
+          matrix.swapBuffers(true);
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
+        }
+      } 
+      if (randDirection == 3)
+      {
+        for (int i = 0; i <= MATRIX_HEIGHT; i++)
+        {
+          matrix.drawLine(0, i,MATRIX_WIDTH, i, matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          delay(swipeSpeed);
+          matrix.swapBuffers(true);
+          matrix.drawLine(0, i, MATRIX_WIDTH, i,  matrix.ColorHSV(0, 0, 0, true));  
+        }
+      }
+       else if (randDirection == 4)
+      {
+        for (int i = MATRIX_HEIGHT; i >=0; i--)
+        {
+          matrix.drawLine(0, i,MATRIX_WIDTH,i,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          delay(swipeSpeed);
+          matrix.swapBuffers(true);
+          matrix.drawLine(0, i, MATRIX_WIDTH,i,  matrix.ColorHSV(0, 0, 0, true));    
+        }
+      } 
+      matrix.swapBuffers(true); 
+  }
+   
 }
