@@ -308,7 +308,7 @@ void sparkles(int passedPotValue, int passedEnvelopeValue)
 
 void swipes(int passedPotValue, int passedEnvelopeValue)
 {
-  int colorMod = 25;
+  int colorMod = 10;
   int swipeColor = map(passedPotValue, 0, 1023, 0, 1500);
   int swipeSpeed = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 5,0);
   int randDirection = random (1,5);
@@ -330,7 +330,8 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
           matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
-          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));   
+          buttonPressed(); 
         }
       }
       else if (randDirection == 2)
@@ -340,7 +341,8 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
           matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
-          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true)); 
+          buttonPressed();
         }
       } 
       if (randDirection == 3)
@@ -351,6 +353,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(0, i, MATRIX_WIDTH, i,  matrix.ColorHSV(0, 0, 0, true));  
+          buttonPressed();
         }
       }
        else if (randDirection == 4)
@@ -361,6 +364,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(0, i, MATRIX_WIDTH,i,  matrix.ColorHSV(0, 0, 0, true));    
+          buttonPressed();
         }
       } 
       matrix.swapBuffers(true); 
