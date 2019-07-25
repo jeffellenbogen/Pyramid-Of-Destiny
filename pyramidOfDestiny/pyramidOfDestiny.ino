@@ -308,6 +308,7 @@ void sparkles(int passedPotValue, int passedEnvelopeValue)
 
 void swipes(int passedPotValue, int passedEnvelopeValue)
 {
+  int colorMod = 25;
   int swipeColor = map(passedPotValue, 0, 1023, 0, 1500);
   int swipeSpeed = map(passedEnvelopeValue, MIN_ENVELOPE, MAX_ENVELOPE, 5,0);
   int randDirection = random (1,5);
@@ -326,7 +327,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
       {
         for (int i = 0; i <= MATRIX_WIDTH; i++)
         {
-          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
@@ -336,7 +337,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
       {
         for (int i = MATRIX_WIDTH; i >=0; i--)
         {
-          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(i, 0, i, MATRIX_HEIGHT,  matrix.ColorHSV(0, 0, 0, true));    
@@ -346,7 +347,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
       {
         for (int i = 0; i <= MATRIX_HEIGHT; i++)
         {
-          matrix.drawLine(0, i,MATRIX_WIDTH, i, matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          matrix.drawLine(0, i,MATRIX_WIDTH, i, matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(0, i, MATRIX_WIDTH, i,  matrix.ColorHSV(0, 0, 0, true));  
@@ -356,7 +357,7 @@ void swipes(int passedPotValue, int passedEnvelopeValue)
       {
         for (int i = MATRIX_HEIGHT; i >=0; i--)
         {
-          matrix.drawLine(0, i,MATRIX_WIDTH,i,  matrix.ColorHSV(swipeColor+i*50, 255, 255, true));
+          matrix.drawLine(0, i,MATRIX_WIDTH,i,  matrix.ColorHSV(swipeColor+i*colorMod, 255, 255, true));
           delay(swipeSpeed);
           matrix.swapBuffers(true);
           matrix.drawLine(0, i, MATRIX_WIDTH,i,  matrix.ColorHSV(0, 0, 0, true));    
